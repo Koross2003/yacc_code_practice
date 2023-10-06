@@ -44,7 +44,27 @@ void add_sym(char *string)
 ```
 
 判定为ID时查找符号表,如果没有结果则添加该符号,如果有结果返回从符号表中查找到的map
-
+```c
+else if(t >='a' && t <='z' || t >='A' && t <='Z' || t == '_')
+{
+	int i = 0;
+	while (t >='a' && t <='z' || t >='A' && t <='Z' || t == '_' || t >= '0' && t <= '9')
+    {
+		id_str[i++] = t;
+		t = getchar();
+	}
+	id_str[i]='\0';
+    int exist = search_sym(id_str);
+    if(exist == 0)
+    {
+        add_sym(id_str);
+        yylval.ident = &symbol_table[symbol_num - 1];
+    }
+    yylval.ident = &symbol_table[exist - 1];
+	ungetc(t, stdin);
+	return ID;
+}
+```
 ## 翻译为汇编语句
 char* code保存汇编语句;addr保存ID或NUMBER的地址符号;is_number判断是否为立即数,如果是NUMBER,在翻译为汇编语句时使用MOV将立即数保存到寄存器钟,如果是ID或者计算的中间结果,使用LDR指令
 ```c
