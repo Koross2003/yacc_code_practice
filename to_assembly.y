@@ -69,10 +69,9 @@ assignstmt : ID ASSIGN assignstmt { $$ = (struct code_block *)malloc(sizeof(stru
            | ID ASSIGN expr { $$ = (struct code_block *)malloc(sizeof(struct code_block));
                               $$->addr = (char *)malloc(50 * sizeof(char)); strcpy($$->addr, $3->addr);
                               $$->code = (char *)malloc(500 * sizeof(char)); strcpy($$->code, $3->code);
-                              if($3->is_number){strcat($$->code, "MOV  R0, #"); strcat($$->code, $3->addr); strcat($$->code, "\n");}
-                              else{strcat($$->code, "LDR  R0, ="); strcat($$->code, $3->addr); strcat($$->code, "\n");}
+                              if($3->is_number){strcat($$->code, "MOV  R2, #"); strcat($$->code, $3->addr); strcat($$->code, "\n");}
+                              else{strcat($$->code, "LDR  R0, ="); strcat($$->code, $3->addr); strcat($$->code, "\n");strcat($$->code, "LDR  R2, [R0]\n");}
                               strcat($$->code, "LDR  R1, ="); strcat($$->code, $1->addr); strcat($$->code, "\n");
-                              strcat($$->code, "LDR  R2, [R0]\n");
                               strcat($$->code, "STR  R2, [R1]\n");
                               $$->is_number = 0; }
            ;
