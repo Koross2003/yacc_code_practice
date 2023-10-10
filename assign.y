@@ -132,7 +132,7 @@ int yylex()
                 add_sym(id_str);
                 yylval.ident = &symbol_table[symbol_num - 1];
             }
-            yylval.ident = &symbol_table[exist - 1];
+            else{ yylval.ident = &symbol_table[exist - 1]; }
 			ungetc(t, stdin);
 			return ID;
 		}
