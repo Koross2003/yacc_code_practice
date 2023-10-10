@@ -62,16 +62,16 @@ lines : lines expr ';' { printf("%s", $2->code); }
 assignstmt : ID ASSIGN assignstmt { $$ = (struct code_block *)malloc(sizeof(struct code_block));
                                     $$->addr = (char *)malloc(50 * sizeof(char)); strcpy($$->addr, $3->addr);
                                     $$->code = (char *)malloc(500 * sizeof(char)); strcpy($$->code, $3->code);
-                                    strcat($$->code, "LDR  R1, "); strcat($$->code, $1->addr); strcat($$->code, "\n");
+                                    strcat($$->code, "LDR  R1, ="); strcat($$->code, $1->addr); strcat($$->code, "\n");
                                     strcat($$->code, "STR  R2, [R1]\n");
                                     $$->is_number = 0; }
 
            | ID ASSIGN expr { $$ = (struct code_block *)malloc(sizeof(struct code_block));
                               $$->addr = (char *)malloc(50 * sizeof(char)); strcpy($$->addr, $3->addr);
                               $$->code = (char *)malloc(500 * sizeof(char)); strcpy($$->code, $3->code);
-                              if($3->is_number){strcat($$->code, "MOV  R0, "); strcat($$->code, $3->addr); strcat($$->code, "\n");}
-                              else{strcat($$->code, "LDR  R0, "); strcat($$->code, $3->addr); strcat($$->code, "\n");}
-                              strcat($$->code, "LDR  R1, "); strcat($$->code, $1->addr); strcat($$->code, "\n");
+                              if($3->is_number){strcat($$->code, "MOV  R0, #"); strcat($$->code, $3->addr); strcat($$->code, "\n");}
+                              else{strcat($$->code, "LDR  R0, ="); strcat($$->code, $3->addr); strcat($$->code, "\n");}
+                              strcat($$->code, "LDR  R1, ="); strcat($$->code, $1->addr); strcat($$->code, "\n");
                               strcat($$->code, "LDR  R2, [R0]\n");
                               strcat($$->code, "STR  R2, [R1]\n");
                               $$->is_number = 0; }
@@ -80,12 +80,10 @@ assignstmt : ID ASSIGN assignstmt { $$ = (struct code_block *)malloc(sizeof(stru
 expr : expr ADD expr { $$ = (struct code_block *)malloc(sizeof(struct code_block));
                        $$->addr = (char *)malloc(50 * sizeof(char)); strcpy($$->addr, "addr_add_result");
                        $$->code = (char *)malloc(500 * sizeof(char)); strcpy($$->code, $1->code); strcat($$->code, $3->code);
-                       if($1->is_number){strcat($$->code, "MOV  R0, "); strcat($$->code, $1->addr); strcat($$->code, "\n");}
-                       else{strcat($$->code, "LDR  R0, "); strcat($$->code, $1->addr); strcat($$->code, "\n");}
-                       if($3->is_number){strcat($$->code, "MOV  R1, "); strcat($$->code, $3->addr); strcat($$->code, "\n");}
-                       else{strcat($$->code, "LDR  R1, "); strcat($$->code, $3->addr); strcat($$->code, "\n");}
-                       strcat($$->code, "LDR  R2, [R0]\n");
-                       strcat($$->code, "LDR  R3, [R1]\n");
+                       if($1->is_number){strcat($$->code, "MOV  R2, #"); strcat($$->code, $1->addr); strcat($$->code, "\n");}
+                       else{strcat($$->code, "LDR  R0, ="); strcat($$->code, $1->addr); strcat($$->code, "\n");strcat($$->code, "LDR  R2, [R0]\n");}
+                       if($3->is_number){strcat($$->code, "MOV  R3, #"); strcat($$->code, $3->addr); strcat($$->code, "\n");}
+                       else{strcat($$->code, "LDR  R1, ="); strcat($$->code, $3->addr); strcat($$->code, "\n");strcat($$->code, "LDR  R3, [R1]\n");}
                        strcat($$->code, "ADD  R2, R2, R3\n");
                        strcat($$->code, "LDR  R0, "); strcat($$->code, $$->addr); strcat($$->code, "\n");
                        strcat($$->code, "STR  R2, [R0]\n");
@@ -94,10 +92,10 @@ expr : expr ADD expr { $$ = (struct code_block *)malloc(sizeof(struct code_block
      | expr SUB expr { $$ = (struct code_block *)malloc(sizeof(struct code_block));
                        $$->addr = (char *)malloc(50 * sizeof(char)); strcpy($$->addr, "addr_sub_result");
                        $$->code = (char *)malloc(500 * sizeof(char)); strcpy($$->code, $1->code); strcat($$->code, $3->code);
-                       if($1->is_number){strcat($$->code, "MOV  R0, "); strcat($$->code, $1->addr); strcat($$->code, "\n");}
-                       else{strcat($$->code, "LDR  R0, "); strcat($$->code, $1->addr); strcat($$->code, "\n");}
-                       if($3->is_number){strcat($$->code, "MOV  R1, "); strcat($$->code, $3->addr); strcat($$->code, "\n");}
-                       else{strcat($$->code, "LDR  R1, "); strcat($$->code, $3->addr); strcat($$->code, "\n");}
+                       if($1->is_number){strcat($$->code, "MOV  R2, #"); strcat($$->code, $1->addr); strcat($$->code, "\n");}
+                       else{strcat($$->code, "LDR  R0, ="); strcat($$->code, $1->addr); strcat($$->code, "\n");strcat($$->code, "LDR  R2, [R0]\n");}
+                       if($3->is_number){strcat($$->code, "MOV  R3, #"); strcat($$->code, $3->addr); strcat($$->code, "\n");}
+                       else{strcat($$->code, "LDR  R1, ="); strcat($$->code, $3->addr); strcat($$->code, "\n");strcat($$->code, "LDR  R3, [R1]\n");}
                        strcat($$->code, "LDR  R2, [R0]\n");
                        strcat($$->code, "LDR  R3, [R1]\n");
                        strcat($$->code, "SUB  R2, R2, R3\n");
@@ -108,10 +106,10 @@ expr : expr ADD expr { $$ = (struct code_block *)malloc(sizeof(struct code_block
      | expr MUL expr { $$ = (struct code_block *)malloc(sizeof(struct code_block));
                        $$->addr = (char *)malloc(50 * sizeof(char)); strcpy($$->addr, "addr_mul_result");
                        $$->code = (char *)malloc(500 * sizeof(char)); strcpy($$->code, $1->code); strcat($$->code, $3->code);
-                       if($1->is_number){strcat($$->code, "MOV  R0, "); strcat($$->code, $1->addr); strcat($$->code, "\n");}
-                       else{strcat($$->code, "LDR  R0, "); strcat($$->code, $1->addr); strcat($$->code, "\n");}
-                       if($3->is_number){strcat($$->code, "MOV  R1, "); strcat($$->code, $3->addr); strcat($$->code, "\n");}
-                       else{strcat($$->code, "LDR  R1, "); strcat($$->code, $3->addr); strcat($$->code, "\n");}
+                       if($1->is_number){strcat($$->code, "MOV  R2, #"); strcat($$->code, $1->addr); strcat($$->code, "\n");}
+                       else{strcat($$->code, "LDR  R0, ="); strcat($$->code, $1->addr); strcat($$->code, "\n");strcat($$->code, "LDR  R2, [R0]\n");}
+                       if($3->is_number){strcat($$->code, "MOV  R3, #"); strcat($$->code, $3->addr); strcat($$->code, "\n");}
+                       else{strcat($$->code, "LDR  R1, ="); strcat($$->code, $3->addr); strcat($$->code, "\n");strcat($$->code, "LDR  R3, [R1]\n");}
                        strcat($$->code, "LDR  R2, [R0]\n");
                        strcat($$->code, "LDR  R3, [R1]\n");
                        strcat($$->code, "MUL  R2, R2, R3\n");
@@ -122,10 +120,10 @@ expr : expr ADD expr { $$ = (struct code_block *)malloc(sizeof(struct code_block
      | expr DIV expr { $$ = (struct code_block *)malloc(sizeof(struct code_block));
                        $$->addr = (char *)malloc(50 * sizeof(char)); strcpy($$->addr, "addr_div_result");
                        $$->code = (char *)malloc(500 * sizeof(char)); strcpy($$->code, $1->code); strcat($$->code, $3->code);
-                       if($1->is_number){strcat($$->code, "MOV  R0, "); strcat($$->code, $1->addr); strcat($$->code, "\n");}
-                       else{strcat($$->code, "LDR  R0, "); strcat($$->code, $1->addr); strcat($$->code, "\n");}
-                       if($3->is_number){strcat($$->code, "MOV  R1, "); strcat($$->code, $3->addr); strcat($$->code, "\n");}
-                       else{strcat($$->code, "LDR  R1, "); strcat($$->code, $3->addr); strcat($$->code, "\n");}
+                       if($1->is_number){strcat($$->code, "MOV  R2, #"); strcat($$->code, $1->addr); strcat($$->code, "\n");}
+                       else{strcat($$->code, "LDR  R0, ="); strcat($$->code, $1->addr); strcat($$->code, "\n");strcat($$->code, "LDR  R2, [R0]\n");}
+                       if($3->is_number){strcat($$->code, "MOV  R3, #"); strcat($$->code, $3->addr); strcat($$->code, "\n");}
+                       else{strcat($$->code, "LDR  R1, ="); strcat($$->code, $3->addr); strcat($$->code, "\n");strcat($$->code, "LDR  R3, [R1]\n");}
                        strcat($$->code, "LDR  R2, [R0]\n");
                        strcat($$->code, "LDR  R3, [R1]\n");
                        strcat($$->code, "SDIV R2, R2, R3\n");
@@ -139,14 +137,13 @@ expr : expr ADD expr { $$ = (struct code_block *)malloc(sizeof(struct code_block
                       $$->is_number = 0; }
 
      | SUB expr %prec UMINUS { $$ = (struct code_block *)malloc(sizeof(struct code_block));
-                               $$->addr = (char *)malloc(50 * sizeof(char)); strcpy($$->addr, "addr_neg_result");
+                               $$->addr = (char *)malloc(50 * sizeof(char)); strcpy($$->addr, "addr_uminus_result");
                                $$->code = (char *)malloc(500 * sizeof(char)); strcpy($$->code, $2->code);
-                               if($2->is_number){strcat($$->code, "MOV  R0, "); strcat($$->code, $2->addr); strcat($$->code, "\n");}
-                               else{strcat($$->code, "LDR  R0, "); strcat($$->code, $2->addr); strcat($$->code, "\n");}
-                               strcat($$->code, "LDR  R1, [R0]\n");
+                               if($2->is_number){strcat($$->code, "MOV  R1, #"); strcat($$->code, $2->addr); strcat($$->code, "\n");}
+                               else{strcat($$->code, "LDR  R0, ="); strcat($$->code, $2->addr); strcat($$->code, "\n");strcat($$->code, "LDR  R1, [R0]\n");}
                                strcat($$->code, "MOV  R2, #0x00\n");
                                strcat($$->code, "SUB  R1, R2, R1\n"); 
-                               strcat($$->code, "LDR  R0, "); strcat($$->code, $$->addr); strcat($$->code, "\n");
+                               strcat($$->code, "LDR  R0, ="); strcat($$->code, $$->addr); strcat($$->code, "\n");
                                strcat($$->code, "STR  R2, [R0]\n");
                                $$->is_number = 0; }
      
